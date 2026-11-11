@@ -140,14 +140,48 @@
     </main> 
     
     <script> 
+
 const form = document.getElementById("patientForm");
 const records = document.getElementById("records");
 const message = document.getElementById("message");
 
-// Load previously saved records
-let patientData = JSON.parse(
-    localStorage.getItem("patients") || "[]"
-);
+let patientData = [];
+
+form.addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const id = document.getElementById("patientId")
+        .value.trim().toUpperCase();
+
+    const name = document.getElementById("patientName")
+        .value.trim();
+
+    const age = document.getElementById("age").value;
+
+    const notes = document.getElementById("notes")
+        .value.trim();
+
+    if (!id || !name || !age || !notes) {
+        message.textContent = "All fields are required.";
+        return;
+    }
+
+    const duplicate = patientData.some(
+        patient => patient.id === id
+    );
+
+    if (duplicate) {
+        message.textContent = "Patient ID already exists.";
+        return;
+    }
+
+    patientData.push({id, name, age, notes});
+
+    displayRecords();
+
+    message.textContent = "Patient added successfully.";
+    form.reset();
+});
 
 function displayRecords() {
     records.innerHTML = "";
@@ -155,45 +189,17 @@ function displayRecords() {
     patientData.forEach(patient => {
         const row = document.createElement("tr");
 
-        Object.values(patient).forEach(value => {
-            const cell = document.createElement("td");
-            cell.textContent = value;
-            row.appendChild(cell);
-        });
+        [patient.id, patient.name, patient.age, patient.notes]
+            .forEach(value => {
+                const cell = document.createElement("td");
+                cell.textContent = value;
+                row.appendChild(cell);
+            });
 
         records.appendChild(row);
     });
 }
 
-form.addEventListener("submit", function(event) {
-    event.preventDefault();
-
-    const patient = {
-        id: document.getElementById("patientId").value.trim(),
-        name: document.getElementById("patientName").value.trim(),
-        age: document.getElementById("age").value,
-        notes: document.getElementById("notes").value.trim()
-    };
-
-    if (Object.values(patient).some(v => v === "")) {
-        message.textContent = "Complete all fields.";
-        return;
-    }
-
-    patientData.push(patient);
-
-    localStorage.setItem(
-        "patients",
-        JSON.stringify(patientData)
-    );
-
-    displayRecords();
-
-    message.textContent = "Record saved successfully.";
-    form.reset();
-});
-
-displayRecords();
 
     </script> </body> </html> 
       
