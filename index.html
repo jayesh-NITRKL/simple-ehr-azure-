@@ -129,5 +129,71 @@
         <label for="patientId">Patient ID</label>       
         <input         id="patientId"         placeholder="Example: P001"         maxlength="30"         required       >     
         <label for="patientName">Patient Name</label> 
-        <input         id="patientName"         placeholder="Example: Demo Patient"         maxlength="100"         required       >        <label for="age">Age in years</label>       <input         id="age"         type="number"         min="0"         max="120"         step="1"         required       >        <label for="notes">Clinical Notes</label>       <textarea         id="notes"         rows="3"         placeholder="Enter sample clinical notes"         maxlength="500"         required       ></textarea>        <button type="submit">Add Patient Record</button>     </form>      <p id="message" role="status"></p>      <h2>Patient Records</h2>      <p>       These records are temporary and disappear when       the page is refreshed.     </p>      <div class="table-container">       <table>         <thead>           <tr>             <th>Patient ID</th>             <th>Name</th>             <th>Age</th>             <th>Clinical Notes</th>           </tr>         </thead>          <tbody id="records"></tbody>       </table>     </div>  <footer> Educational EHR demonstration | Microsoft Azure </footer> </main> <script> const form = document.getElementById("patientForm"); const records = document.getElementById("records"); const message = document.getElementById("message"); form.addEventListener("submit", function (event) { event.preventDefault(); const values = [ document.getElementById("patientId").value.trim(), document.getElementById("patientName").value.trim(), document.getElementById("age").value, document.getElementById("notes").value.trim() ]; if (values.some(value => value === "")) { message.textContent = "Please complete every field."; return; } const row = document.createElement("tr"); values.forEach(function (value) { const cell = document.createElement("td"); cell.textContent = value; row.appendChild(cell); }); records.appendChild(row); message.textContent = "Patient record added successfully."; form.reset(); document.getElementById("patientId").focus(); }); </script> </body> </html> 
+        <input         id="patientName"         placeholder="Example: Demo Patient"         maxlength="100"         required       >     
+        <label for="age">Age in years</label>  
+        <input         id="age"         type="number"         min="0"         max="120"         step="1"         required       > 
+        <label for="notes">Clinical Notes</label>     
+        <textarea         id="notes"         rows="3"         placeholder="Enter sample clinical notes"         maxlength="500"         required       >
+          
+        </textarea>        <button type="submit">Add Patient Record</button>     </form>      <p id="message" role="status"></p>      <h2>Patient Records</h2>      <p>       These records are temporary and disappear when       the page is refreshed.     </p>      <div class="table-container">       <table>         <thead>           <tr>             <th>Patient ID</th>             <th>Name</th>             <th>Age</th>             <th>Clinical Notes</th>           </tr>         </thead>          <tbody id="records"></tbody>       </table>     </div>  <footer> Educational EHR demonstration | Microsoft Azure </footer>
+    
+    </main> 
+    
+    <script> 
+const form = document.getElementById("patientForm");
+const records = document.getElementById("records");
+const message = document.getElementById("message");
+
+// Load previously saved records
+let patientData = JSON.parse(
+    localStorage.getItem("patients") || "[]"
+);
+
+function displayRecords() {
+    records.innerHTML = "";
+
+    patientData.forEach(patient => {
+        const row = document.createElement("tr");
+
+        Object.values(patient).forEach(value => {
+            const cell = document.createElement("td");
+            cell.textContent = value;
+            row.appendChild(cell);
+        });
+
+        records.appendChild(row);
+    });
+}
+
+form.addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const patient = {
+        id: document.getElementById("patientId").value.trim(),
+        name: document.getElementById("patientName").value.trim(),
+        age: document.getElementById("age").value,
+        notes: document.getElementById("notes").value.trim()
+    };
+
+    if (Object.values(patient).some(v => v === "")) {
+        message.textContent = "Complete all fields.";
+        return;
+    }
+
+    patientData.push(patient);
+
+    localStorage.setItem(
+        "patients",
+        JSON.stringify(patientData)
+    );
+
+    displayRecords();
+
+    message.textContent = "Record saved successfully.";
+    form.reset();
+});
+
+displayRecords();
+
+    </script> </body> </html> 
       
